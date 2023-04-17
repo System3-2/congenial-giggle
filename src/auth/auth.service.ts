@@ -47,7 +47,7 @@ export class AuthService {
 
     // throw error is user does't exist
     if (!user) throw new ForbiddenException('User does not exist')
-    
+
     // compare password to hash
     const pwMatches = await argon.verify(user.hash, dto.password)
 
