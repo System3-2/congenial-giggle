@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Wardprowse26
+      POSTGRES_DB: nest
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
