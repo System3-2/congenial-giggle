@@ -20,7 +20,7 @@ export class AuthService {
           hash: hash
         }
       })
-      return this.signToken(user.id, user.email)
+      return this.signToken(user.id, user.email, 'Signup Successful')
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) throw new ForbiddenException('Account already exists ')
       else {
@@ -32,6 +32,7 @@ export class AuthService {
 
   async login(dto: AuthDto) {
     //Find user by email
+
     const user = await this.prismaService.user.findUnique({
       where: {
         email: dto.email
@@ -41,14 +42,16 @@ export class AuthService {
     if (!user) throw new ForbiddenException('User does not exists')
 
     //const pwMatches = await argon.verify(user.hash, dto.password)
-    const pwMatches = argon.verify(user.hash, dto.password)
+    const pwMatches = await argon.verify(user.hash, dto.password)
+    console.log(pwMatches)
 
     if (!pwMatches) throw new ForbiddenException('Invalid Credentials')
 
-    return this.signToken(user.id, user.email);
+    return this.signToken(user.id, user.email, 'Login Successful')
+
   }
 
-  async signToken(userId: number, email: string): Promise<{ access_token: string }> {
+  async signToken(userId: number, email: string, message: string): Promise<{ access_token: string, email: string, message: string }> {
     const payload = {
       sub: userId,
       email
@@ -60,7 +63,9 @@ export class AuthService {
       secret: this.config.get('JWT_SECRET')
     })
     return {
-      access_token: token
+      access_token: token,
+      email,
+      message
     }
   }
 }
