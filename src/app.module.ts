@@ -15,7 +15,7 @@ import { JwtStrategy } from './auth/strategy';
     PrismaModule,
     JwtModule,
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     UserModule,
   ],
