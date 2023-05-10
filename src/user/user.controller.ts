@@ -3,10 +3,11 @@ import { AuthGuard } from 'src/auth/guards';
 
 @Controller('users')
 export class UserController {
+
   @UseGuards(AuthGuard)
   @Get('me')
   getMe(@Request() req) {
-    return req
+    return req.user
   }
 
 }
