@@ -6,6 +6,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtService } from '@nestjs/jwt';
 import { UserModule } from './user/user.module';
+import { JwtStrategy } from './auth/strategy';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { UserModule } from './user/user.module';
     UserModule,
   ],
   controllers: [],
-  providers: [JwtService]
+  providers: [JwtService, JwtStrategy],
+  exports: [JwtModule]
 })
 
 export class AppModule { }
