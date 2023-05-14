@@ -2,6 +2,7 @@ import { Body, Controller, Post, Get, UseGuards, Request } from '@nestjs/common'
 import { AuthService } from './auth.service';
 import { AuthDto } from 'src/dto';
 import { AuthGuard } from './guards';
+import { Request as Req } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -19,8 +20,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('private')
-  profile(@Request() req) {
-    console.log(req)
+  async profile(@Request() req: Req) {
+
     return req.user
   }
 }
