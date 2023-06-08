@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
 import AWS from 'aws-sdk'
+import ejs from 'ejs'
+import path from 'path'
 const PORT = process.env.PORT || 3000
 dotenv.config()
 
@@ -14,27 +16,6 @@ const SESCONFIG = {
   secretAccessKey: process.env.SECRET_ACCESS_KEY
 }
 
-const PARAMS = {
-  Source: 'olojam4969@gmail.com',
-  Destination: {
-    ToAddresses: [
-      'olojam4969@gmail.com',
-      'olojam266@gmail.com',
-    ]
-  },
-  Message: {
-    Body: {
-      Html: {
-        Charset: 'UTF-8',
-        Data: "It is <strong>Working</strong>!",
-      }
-    },
-    Subject: {
-      Charset: 'UTF-8',
-      Data: "Nodejs + SES",
-    },
-  }
-}
 
 const app = express()
 app.use(express.json())
@@ -44,10 +25,52 @@ app.get('/', (req, res) => {
 })
 
 app.get('/email', (req, res) => {
-  new AWS.SES(SESCONFIG).sendEmail(PARAMS).promise().then(res => {
-    console.log(res)
+
+  ejs.renderFile('./templates/welcome.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+
+
+    const PARAMS = {
+      Source: 'olojam4969@gmail.com',
+      Destination: {
+        ToAddresses: [
+          'olojam4969@gmail.com',
+        ]
+      },
+      Message: {
+        Body: {
+          Html: {
+            Charset: 'UTF-8',
+            Data: data,
+          }
+        },
+        Subject: {
+          Charset: 'UTF-8',
+          Data: "Ejs"
+        },
+      }
+    }
+
+    new AWS.SES(SESCONFIG).sendEmail(PARAMS).promise().then(res => {
+      console.log(res)
+    })
+    res.send('email sent')
   })
-  res.send('email sent')
+
+})
+
+app.get('/ejs', (req, res) => {
+
+  ejs.renderFile('./templates/welcome.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.send(data)
+    }
+  })
 })
 
 
