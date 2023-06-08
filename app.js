@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 
 app.get('/email', (req, res) => {
 
-  ejs.renderFile('./templates/welcome.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
+  ejs.renderFile('./templates/index.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
     if (err) {
       console.log(err);
     }
@@ -63,7 +63,7 @@ app.get('/email', (req, res) => {
 
 app.get('/ejs', (req, res) => {
 
-  ejs.renderFile('./templates/welcome.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
+  ejs.renderFile('./templates/index.ejs', { receiver: 'Oloja', content: 'Nice one' }, (err, data) => {
     if (err) {
       console.log(err);
     }
