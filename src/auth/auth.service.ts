@@ -7,8 +7,9 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { SignUpDto, LoginDto } from './dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MailService } from './mail.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -17,8 +18,9 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
-    private mail: MailerService,
     private event: EventEmitter2,
+    private mail: MailerService,
+    private mailer: MailService,
   ) {}
 
   //FIX: add bcrypt for password hashing
@@ -33,7 +35,12 @@ export class AuthService {
     });
 
     // this.logger.debug(user);
-    this.sendMail();
+    // this.sendConfirmationEmail(user.email, user.firstName, user.lastName);
+    this.mailer.sendConfirmationEmail(
+      user.email,
+      user.firstName,
+      user.lastName,
+    );
     return user;
   }
   async login(loginDto: LoginDto) {
@@ -51,8 +58,7 @@ export class AuthService {
     if (!pwMatches) throw new ForbiddenException('Invalid credentials');
 
     // this.logger.debug(user);
-    return this.sendMail();
-    // return user;
+    return user;
   }
 
   //PERF: generate jwt token for authentication
@@ -60,14 +66,17 @@ export class AuthService {
     return 'token signed';
   }
 
-  //TODO: Render template
-  sendMail(): void {
+  sendConfirmationEmail(
+    email: string,
+    firstName?: string,
+    lastName?: string,
+  ): void {
     this.mail
       .sendMail({
         to: 'olojam266@gmail.com',
         from: 'noreply@nestjs.com',
         subject: 'Testing Nest Mailermodule with template ✔',
-        html: '<h1>hi there</h1>',
+        html: `<h1>hi ${firstName} ${lastName}</h1>`,
       })
       .then((success) => {
         console.log(success);

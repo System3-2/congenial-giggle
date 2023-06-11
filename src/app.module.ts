@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MailService } from './auth/mail.service';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -30,6 +31,6 @@ dotenv.config();
     EventEmitterModule.forRoot(),
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}

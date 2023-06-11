@@ -2,25 +2,26 @@ import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 
+@Injectable()
 export class MailService {
   private logger = new Logger(MailerService.name);
-  constructor(
-    private readonly mailer: MailerService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private config: ConfigService, private mail: MailerService) {}
 
-  sendConfirmationMail(email: string): void {
-    this.mailer
+  //TODO: Render template
+  async sendConfirmationEmail(
+    email: string,
+    firstName?: string,
+    lastName?: string,
+  ) {
+    this.logger.log(email, firstName, lastName);
+    this.logger.debug(this.config);
+    this.logger.debug(this.mail);
+    this.mail
       .sendMail({
-        to: 'test@nestjs.com',
+        to: email,
         from: 'noreply@nestjs.com',
         subject: 'Testing Nest Mailermodule with template ✔',
-        template: '/index', // The `.pug` or `.hbs` extension is appended automatically.
-        context: {
-          // Data to be sent to template engine.
-          code: 'cf1a3f828287',
-          username: 'john doe',
-        },
+        html: `<h1>hi ${firstName} ${lastName}</h1>`,
       })
       .then((success) => {
         console.log(success);
