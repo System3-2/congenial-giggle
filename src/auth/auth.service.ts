@@ -10,6 +10,8 @@ import { SignUpDto, LoginDto } from './dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
 import { MailerService } from '@nestjs-modules/mailer';
+//HACK: Event types
+import { EvenTypes } from 'src/Events/event-types';
 
 @Injectable()
 export class AuthService {
@@ -34,13 +36,17 @@ export class AuthService {
       },
     });
 
-    // this.logger.debug(user);
     // this.sendConfirmationEmail(user.email, user.firstName, user.lastName);
-    this.mailer.sendConfirmationEmail(
-      user.email,
-      user.firstName,
-      user.lastName,
-    );
+    // this.mailer.sendConfirmationEmail(
+    //   user.email,
+    //   user.firstName,
+    //   user.lastName,
+    // );
+    this.event.emit(EvenTypes.EMAIL_CONFIRMATION, {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
     return user;
   }
   async login(loginDto: LoginDto) {
@@ -66,23 +72,10 @@ export class AuthService {
     return 'token signed';
   }
 
-  sendConfirmationEmail(
-    email: string,
-    firstName?: string,
-    lastName?: string,
-  ): void {
-    this.mail
-      .sendMail({
-        to: 'olojam266@gmail.com',
-        from: 'noreply@nestjs.com',
-        subject: 'Testing Nest Mailermodule with template ✔',
-        html: `<h1>hi ${firstName} ${lastName}</h1>`,
-      })
-      .then((success) => {
-        console.log(success);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  //PERF: delete records
+  async delete() {
+    const data = await this.prisma.user.deleteMany();
+    this.logger.debug(data);
+    return 'database user model cleared';
   }
 }
