@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -26,6 +27,7 @@ dotenv.config();
         },
       },
     }),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [],
   providers: [AppService],
