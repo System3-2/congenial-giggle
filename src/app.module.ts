@@ -7,6 +7,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailService } from './auth/mail.service';
 import * as dotenv from 'dotenv';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
 dotenv.config();
 
 @Module({
@@ -27,10 +29,18 @@ dotenv.config();
           pass: process.env.SMTP_PASSWORD,
         },
       },
+
+      template: {
+        dir: join(`${__dirname}'.templates/`),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
     EventEmitterModule.forRoot(),
   ],
   controllers: [],
-  providers: [AppService, MailService],
+  providers: [AppService],
 })
 export class AppModule {}

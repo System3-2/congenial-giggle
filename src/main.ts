@@ -4,17 +4,18 @@ import * as dotenv from 'dotenv';
 import { ValidationPipe } from '@nestjs/common';
 dotenv.config();
 
-console.log(process.env.PORT);
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidUnknownValues: true,
-    forbidNonWhitelisted: true,
-    stopAtFirstError: true,
-  }))
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidUnknownValues: true,
+      forbidNonWhitelisted: true,
+      stopAtFirstError: true,
+    }),
+  );
 
-
+  console.log(`Server is listening on PORT ${process.env.PORT}`);
   await app.listen(process.env.PORT);
 }
 bootstrap();

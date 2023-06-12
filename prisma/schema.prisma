@@ -20,6 +20,7 @@ model User {
     hash String
     verified Boolean @default(false)
     profilePicture String?
-
+    emailToken String? @unique
     @@map("users")
   }
+

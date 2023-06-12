@@ -9,6 +9,8 @@ type EventPayload = {
   email: string;
   firstName: string;
   lastName: string;
+  link: string;
+  token: string;
 };
 
 @Injectable()
@@ -47,12 +49,18 @@ export class MailService {
   //PERF: Emit event for email
   @OnEvent(EvenTypes.EMAIL_CONFIRMATION)
   handleEmailConfirmation(payload: EventPayload) {
+    this.logger.debug(payload);
     this.mail
       .sendMail({
-        to: `${payload.email}, olojam266@gmail.com`,
+        to: `${payload.email}`,
         from: 'noreply@nestjs.com',
-        subject: 'Testing Nest Mailermodule with template ✔',
-        html: `<h1>hi ${payload.firstName} ${payload.lastName}</h1>`,
+        subject: 'Account Verification ✔',
+        template: '../templates/confirmationEmail.hbs',
+        context: {
+          name: `${payload.firstName}  ${payload.lastName}`,
+          link: payload.link,
+          token: payload.token,
+        },
       })
       .then((success) => {
         this.logger.verbose(success);
