@@ -80,8 +80,8 @@ export class AuthService {
           throw new BadRequestException('Email already exist');
         }
       } else {
-        this.logger.error(error);
-        throw new BadRequestException('An error occurred on the server');
+        // this.logger.error(error);
+        throw new BadRequestException('Email already exist');
       }
     }
   }
@@ -159,6 +159,11 @@ export class AuthService {
       });
       this.logger.log(user);
       this.logger.log(data);
+      this.event.emit(EvenTypes.ACCOUNT_VERIFIED, {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
       return {
         user,
         message: 'Account verified',

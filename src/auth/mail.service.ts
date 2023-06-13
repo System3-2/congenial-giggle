@@ -5,12 +5,17 @@ import { OnEvent } from '@nestjs/event-emitter';
 //HACK: Event types
 import { EvenTypes } from 'src/Events/event-types';
 
-type EventPayload = {
+interface Payload {
   email: string;
   firstName: string;
   lastName: string;
+}
+
+interface EventPayload extends Payload {
   token: string;
-};
+}
+
+interface VerifiedPayload extends Payload {}
 
 @Injectable()
 export class MailService {
@@ -20,6 +25,7 @@ export class MailService {
   //PERF: Emit event for email
   @OnEvent(EvenTypes.EMAIL_CONFIRMATION)
   handleEmailConfirmation(payload: EventPayload) {
+    const host = this.config.get('HOST');
     this.logger.debug(payload);
     let from = `Jobster <noreply@nestjs.com>`;
     this.mail
@@ -31,10 +37,34 @@ export class MailService {
         context: {
           name: `${payload.firstName}  ${payload.lastName}`,
           token: payload.token,
+          host,
         },
       })
       .then((success) => {
         this.logger.verbose(success);
+      })
+      .catch((err) => {
+        this.logger.verbose(err);
+      });
+  }
+
+  @OnEvent(EvenTypes.ACCOUNT_VERIFIED)
+  handleAccountVerification(payload: VerifiedPayload) {
+    this.logger.debug(payload);
+    let from = `Jobster <noreply@nestjs.com>`;
+    this.mail
+      .sendMail({
+        to: `${payload.email}`,
+        from: from,
+        subject: `Welcome onboard ${payload.firstName} ${payload.lastName} ✔`,
+        template: '../templates/accountVerification.hbs',
+        context: {
+          name: `${payload.firstName}  ${payload.lastName}`,
+        },
+      })
+      .then((success) => {
+        this.logger.verbose(success);
+        this.logger.verbose(`Email sent to alert on account verify`);
       })
       .catch((err) => {
         this.logger.verbose(err);
