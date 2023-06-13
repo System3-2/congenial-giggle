@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { SignUpDto, LoginDto } from './dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
+import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
 //HACK: Event types
 import { EvenTypes } from 'src/Events/event-types';
@@ -30,13 +31,13 @@ export class AuthService {
     private event: EventEmitter2,
     private mail: MailerService,
     private mailer: MailService,
+    private jwt: JwtService,
   ) {}
 
   //FIX: add bcrypt for password hashing
   async signup(signUpDto: SignUpDto) {
     const hash = await argon.hash(signUpDto.password);
-    const token = this.generateToken(45);
-    const link = `http://localhost:8080:/auth/verify/${token}`;
+    const key = this.generateToken(45);
 
     try {
       const user = await this.prisma.user.create({
@@ -45,19 +46,33 @@ export class AuthService {
           lastName: signUpDto.lastName,
           email: signUpDto.email,
           hash: hash,
-          emailToken: token,
+          emailToken: key,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          profilePicture: true,
         },
       });
       //TODO: check for prisma error
 
+      const token = this.jwt.sign({
+        email: user.email,
+        key,
+      });
+      this.logger.debug(token);
       this.event.emit(EvenTypes.EMAIL_CONFIRMATION, {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        link,
         token,
       });
-      return token;
+      return {
+        user,
+        message: 'Account Registered.',
+      };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -65,6 +80,7 @@ export class AuthService {
           throw new BadRequestException('Email already exist');
         }
       } else {
+        this.logger.error(error);
         throw new BadRequestException('An error occurred on the server');
       }
     }
@@ -123,5 +139,33 @@ export class AuthService {
     }
     this.logger.verbose(token);
     return token;
+  }
+
+  async verifiToken(token: string) {
+    try {
+      const data = await this.jwt.verify(token);
+      const user = await this.prisma.user.update({
+        where: { email: data.email },
+        data: {
+          verified: true,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          profilePicture: true,
+        },
+      });
+      this.logger.log(user);
+      this.logger.log(data);
+      return {
+        user,
+        message: 'Account verified',
+      };
+    } catch (error) {
+      this.logger.debug(error);
+      return new BadRequestException('Expired token');
+    }
   }
 }

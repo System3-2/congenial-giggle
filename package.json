@@ -25,6 +25,7 @@
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.0.0",
     "@nestjs/event-emitter": "^1.4.1",
+    "@nestjs/jwt": "^10.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.15.0",
     "@types/nodemailer": "^6.4.8",

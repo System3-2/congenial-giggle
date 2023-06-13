@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ConfigService } from '@nestjs/config';
 import { MailService } from './auth/mail.service';
+import { JwtService } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
@@ -15,6 +18,11 @@ dotenv.config();
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '30m' },
     }),
     AuthModule,
     PrismaModule,
@@ -41,6 +49,7 @@ dotenv.config();
     EventEmitterModule.forRoot(),
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [AppService, JwtService],
+  exports: [JwtService],
 })
 export class AppModule {}

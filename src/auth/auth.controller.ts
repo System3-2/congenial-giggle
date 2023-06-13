@@ -18,7 +18,9 @@ export class AuthController {
 
   @Get('verify/:token')
   verifyAccount(@Param('token') token: string) {
-    return this.authService.verifyAccount(token);
+    this.logger.debug(token);
+    return this.authService.verifiToken(token);
+    // return this.authService.verifyAccount(token);
   }
 
   @Get('delete')
