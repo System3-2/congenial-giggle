@@ -12,6 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import { ProfileModule } from './profile/profile.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 dotenv.config();
 
 @Module({
@@ -47,6 +49,8 @@ dotenv.config();
       },
     }),
     EventEmitterModule.forRoot(),
+    ProfileModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [AppService, JwtService],
