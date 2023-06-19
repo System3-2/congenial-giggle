@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Logger, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Logger,
+  Get,
+  Param,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto, LoginDto } from './dto';
 
@@ -19,12 +28,19 @@ export class AuthController {
   @Get('verify/:token')
   verifyAccount(@Param('token') token: string) {
     this.logger.debug(token);
-    return this.authService.verifiToken(token);
+    return this.authService.verifyToken(token);
     // return this.authService.verifyAccount(token);
   }
 
   @Get('delete')
   deleteMany() {
     return this.authService.delete();
+  }
+
+  @Get('resendVerification')
+  resendVerification(@Query('email') email: string) {
+    this.logger.debug(email);
+    if (!email) throw new BadRequestException('Email empty');
+    return this.authService.resendVerification(email);
   }
 }

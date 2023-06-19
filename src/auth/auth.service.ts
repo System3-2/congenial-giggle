@@ -141,7 +141,7 @@ export class AuthService {
     return token;
   }
 
-  async verifiToken(token: string) {
+  async verifyToken(token: string) {
     try {
       const data = await this.jwt.verify(token);
       const user = await this.prisma.user.update({
@@ -171,6 +171,36 @@ export class AuthService {
     } catch (error) {
       this.logger.debug(error);
       return new BadRequestException('Expired token');
+    }
+  }
+
+  async resendVerification(email: string) {
+    const key = this.generateToken(45);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+      if (!user) throw new NotFoundException('User does not exist');
+      if (user.verified === true)
+        throw new NotFoundException('Account already verified');
+
+      const token = this.jwt.sign({
+        email: user.email,
+        key,
+      });
+
+      this.event.emit(EvenTypes.EMAIL_CONFIRMATION, {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        token,
+      });
+      return {
+        message: 'Email confirmation resent',
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error?.message || 'Error');
     }
   }
 }
