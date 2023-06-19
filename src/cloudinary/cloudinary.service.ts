@@ -7,7 +7,7 @@ export class CloudinaryService {
   async uploadImage(
     file: Express.Multer.File,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
-    if (file.size > 1000000) {
+    if (file.size > 10000000) {
       throw new BadRequestException(
         'Please upload a file size not more than 1M',
       );
