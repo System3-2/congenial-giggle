@@ -182,7 +182,7 @@ export class AuthService {
       });
       if (!user) throw new NotFoundException('User does not exist');
       if (user.verified === true)
-        throw new NotFoundException('Account already verified');
+        throw new BadRequestException('Account already verified');
 
       const token = this.jwt.sign({
         email: user.email,

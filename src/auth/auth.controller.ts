@@ -39,6 +39,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @ApiOkResponse({ description: 'Account Verified' })
+  @ApiNotFoundResponse({ description: 'User does not exists' })
+  @ApiBadRequestResponse({ description: 'Account already verified' })
   @Get('verify/:token')
   verifyAccount(@Param('token') token: string) {
     this.logger.debug(token);
@@ -46,6 +49,9 @@ export class AuthController {
     // return this.authService.verifyAccount(token);
   }
 
+  @ApiOkResponse({ description: 'Account Verified' })
+  @ApiNotFoundResponse({ description: 'User does not exists' })
+  @ApiBadRequestResponse({ description: 'Account already verified' })
   @Get('resendVerification')
   resendVerification(@Query('email') email: string) {
     this.logger.debug(email);
@@ -54,6 +60,9 @@ export class AuthController {
   }
 
   //TODO: implement password reset
+  @ApiOkResponse({ description: 'Password recovery email sent' })
+  @ApiNotFoundResponse({ description: 'User does not exists' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
   @Post('password_recovery')
   passwordRecovery(@Query('email') email: string) {
     this.logger.debug(email);
