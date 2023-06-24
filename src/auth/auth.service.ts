@@ -203,4 +203,37 @@ export class AuthService {
       throw new BadRequestException(error?.message || 'Error');
     }
   }
+
+  async passwordRecovery(email: string) {
+    const key = this.generateToken(45);
+
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+      if (!user) throw new NotFoundException('User does not exist');
+
+      const token = this.jwt.sign({
+        email: user.email,
+        key,
+      });
+      await this.prisma.user.update({
+        where: { email: user.email },
+        data: { emailToken: key },
+      });
+      this.logger.debug(token);
+      this.event.emit(EvenTypes.PASSWORD_RECOVERY, {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        token,
+      });
+      return {
+        message: 'Password recovery email sent',
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error?.message);
+    }
+  }
 }

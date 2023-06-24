@@ -70,4 +70,29 @@ export class MailService {
         this.logger.verbose(err);
       });
   }
+
+  @OnEvent(EvenTypes.PASSWORD_RECOVERY)
+  handlePasswordRecovery(payload: EventPayload) {
+    this.logger.debug(payload);
+    const host = this.config.get('HOST');
+    let from = `Jobster <noreply@nestjs.com>`;
+    this.mail
+      .sendMail({
+        to: `${payload.email}`,
+        from: from,
+        subject: 'Account Verification ✔',
+        template: '../templates/passwordRecovery.hbs',
+        context: {
+          name: `${payload.firstName}  ${payload.lastName}`,
+          token: payload.token,
+          host,
+        },
+      })
+      .then((success) => {
+        this.logger.verbose(success);
+      })
+      .catch((err) => {
+        this.logger.verbose(err);
+      });
+  }
 }

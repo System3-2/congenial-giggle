@@ -28,13 +28,8 @@ export class AuthController {
   @Get('verify/:token')
   verifyAccount(@Param('token') token: string) {
     this.logger.debug(token);
-    return this.authService.verifyToken(token);
+    return this.authService.verifyAccount(token);
     // return this.authService.verifyAccount(token);
-  }
-
-  @Get('delete')
-  deleteMany() {
-    return this.authService.delete();
   }
 
   @Get('resendVerification')
@@ -42,5 +37,13 @@ export class AuthController {
     this.logger.debug(email);
     if (!email) throw new BadRequestException('Email empty');
     return this.authService.resendVerification(email);
+  }
+
+  //TODO: implement password reset
+  @Post('password_recovery')
+  passwordRecovery(@Query('email') email: string) {
+    this.logger.debug(email);
+    if (!email) throw new BadRequestException('Email empty');
+    return this.authService.passwordRecovery(email);
   }
 }
