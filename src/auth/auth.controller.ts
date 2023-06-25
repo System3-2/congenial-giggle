@@ -51,7 +51,7 @@ export class AuthController {
 
   @ApiOkResponse({ description: 'Account Verified' })
   @ApiNotFoundResponse({ description: 'User does not exists' })
-  @ApiBadRequestResponse({ description: 'Account already verified' })
+  @ApiBadRequestResponse({ description: 'Expired token' })
   @Get('resendVerification')
   resendVerification(@Query('email') email: string) {
     this.logger.debug(email);

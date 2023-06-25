@@ -111,18 +111,35 @@ export class AuthService {
   async verifyAccount(token: string) {
     this.logger.debug(token);
     try {
-      const user = this.prisma.user.findFirst({
-        where: {
-          emailToken: token,
+      const data = await this.jwt.verify(token);
+      const user = await this.prisma.user.update({
+        where: { email: data.email },
+        data: {
+          verified: true,
         },
         select: {
-          email: true,
+          id: true,
           firstName: true,
           lastName: true,
+          email: true,
+          profilePicture: true,
         },
       });
-      this.logger.debug(user);
-    } catch (error) {}
+      this.logger.log(user);
+      this.logger.log(data);
+      this.event.emit(EvenTypes.ACCOUNT_VERIFIED, {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
+      return {
+        user,
+        message: 'Account verified',
+      };
+    } catch (error) {
+      this.logger.debug(error);
+      return new BadRequestException('Expired token');
+    }
   }
 
   //PERF: delete records
