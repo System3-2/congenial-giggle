@@ -3,20 +3,28 @@ import {
   Body,
   Controller,
   Logger,
+  NotFoundException,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ProfileDto } from './dto/profile.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProfileService } from './profile.service';
 
-type Body = {
-  email: string;
-};
-
+@ApiTags('Profile')
 @Controller('profile')
 export class ProfileController {
   constructor(
@@ -28,9 +36,30 @@ export class ProfileController {
   private readonly logger = new Logger(ProfileController.name);
   private expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
+  @ApiOperation({ summary: 'Upload a profile picture' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Profile Picture upload',
+    schema: {
+      type: 'object',
+      properties: {
+        email: {
+          // $ref: '#/components/schemas/ProfileDto',
+          type: 'string',
+        },
+        profile: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({ description: 'Image uploaded' })
+  @ApiBadRequestResponse({ description: 'Invalid email' })
+  @ApiNotFoundResponse({ description: 'User does not exist' })
   @Post('picture')
   @UseInterceptors(
-    FileInterceptor('profile-picture', {
+    FileInterceptor('profile', {
       limits: {
         files: 5, // Maximum 5 files
       },
@@ -45,8 +74,8 @@ export class ProfileController {
     }),
   )
   async uploadProfilePicture(
+    @Body() body: ProfileDto,
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: Body,
   ) {
     const email = body.email;
     if (Object.keys(body).length === 0) {
@@ -57,7 +86,7 @@ export class ProfileController {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-    if (!user) throw new BadRequestException('User does not exist');
+    if (!user) throw new NotFoundException('User does not exist');
 
     try {
       console.log(file);
