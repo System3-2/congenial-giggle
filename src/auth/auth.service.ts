@@ -103,11 +103,6 @@ export class AuthService {
     return user;
   }
 
-  //PERF: generate jwt token for authentication
-  signToken() {
-    return 'token signed';
-  }
-
   async verifyAccount(token: string) {
     this.logger.debug(token);
     try {
