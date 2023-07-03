@@ -1,7 +1,12 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+//INFO: init font
+const poppins = Poppins({
+  weight: ['400', '600', '800'],
+  subsets: ['latin'],
+  preload: false,
+});
 
 export const metadata = {
   title: 'Jobster | Get your desired client',
@@ -17,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={poppins.className}>{children}</body>
     </html>
   );
 }
