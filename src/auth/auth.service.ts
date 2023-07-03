@@ -100,14 +100,7 @@ export class AuthService {
     if (!pwMatches) throw new ForbiddenException('Invalid credentials');
 
     // this.logger.debug(user);
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      verified: user.verified,
-      profilePicture: user.profilePicture,
-    };
+    return this.SignToken(user.id, 'User logged in', user.email);
   }
 
   async verifyAccount(token: string) {
@@ -257,13 +250,30 @@ export class AuthService {
   }
 
   async SignToken(
-    userId: number,
-    user?: object,
+    userId: string,
+    message: string,
+    email?: string,
   ): Promise<{ access_token: string; message: string; user: object }> {
+    const token = this.jwt.sign({
+      sub: userId,
+      email,
+    });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        verified: true,
+        profilePicture: true,
+      },
+    });
+
     return {
-      access_token: 'fjd',
-      message: 'User logged in',
+      access_token: token,
       user,
+      message,
     };
   }
 }

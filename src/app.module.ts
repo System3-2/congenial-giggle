@@ -6,8 +6,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ConfigService } from '@nestjs/config';
-import { MailService } from './auth/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
