@@ -100,7 +100,14 @@ export class AuthService {
     if (!pwMatches) throw new ForbiddenException('Invalid credentials');
 
     // this.logger.debug(user);
-    return user;
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      verified: user.verified,
+      profilePicture: user.profilePicture,
+    };
   }
 
   async verifyAccount(token: string) {
@@ -247,5 +254,16 @@ export class AuthService {
       this.logger.error(error);
       throw new BadRequestException(error?.message);
     }
+  }
+
+  async SignToken(
+    userId: number,
+    user?: object,
+  ): Promise<{ access_token: string; message: string; user: object }> {
+    return {
+      access_token: 'fjd',
+      message: 'User logged in',
+      user,
+    };
   }
 }
