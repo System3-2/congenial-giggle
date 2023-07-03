@@ -7,11 +7,13 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
@@ -23,8 +25,11 @@ import { ProfileDto } from './dto/profile.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProfileService } from './profile.service';
+import { JwtGuard } from 'src/guards/jwt.guard';
 
 @ApiTags('Profile')
+@ApiBearerAuth()
+@UseGuards(JwtGuard)
 @Controller('profile')
 export class ProfileController {
   constructor(

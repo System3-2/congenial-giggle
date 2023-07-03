@@ -7,8 +7,6 @@ import {
   Param,
   Query,
   BadRequestException,
-  UseGuards,
-  Request,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -17,7 +15,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from 'src/guards/jwt.guard';
 import { AuthService } from './auth.service';
 import { SignUpDto, LoginDto } from './dto';
 
@@ -71,11 +68,5 @@ export class AuthController {
     this.logger.debug(email);
     if (!email) throw new BadRequestException('Email empty');
     return this.authService.passwordRecovery(email);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get('Protected')
-  protectedRoute(@Request() req) {
-    return req.user;
   }
 }
